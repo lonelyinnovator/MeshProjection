@@ -13,18 +13,18 @@ int main(int argc, char *argv[]) {
 //        std::filesystem::remove_all(image_dir);
 //    }
 
-    Render render;
+  Render render;
 
-    render.OneCameraRender();
+  render.OneCameraRender();
 
-    // render shaded
+  // render shaded
 //    render.MeshProjectionRender(true);
-    // render depth map
+  // render depth map
 //    render.mesh_projection_render(false);
 
 //    shaded_seg_render(window);
 
-    glfwTerminate();
-    return 0;
+  glfwTerminate();
+  return 0;
 }
 

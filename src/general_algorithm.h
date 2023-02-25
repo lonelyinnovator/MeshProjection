@@ -3,8 +3,8 @@
  * General algorithm used in the program.
  */
 
-#ifndef OPENGL_GENERAL_ALGORITHM_H
-#define OPENGL_GENERAL_ALGORITHM_H
+#ifndef MESHPROJECTION_GENERAL_ALGORITHM_H
+#define MESHPROJECTION_GENERAL_ALGORITHM_H
 
 #include <iostream>
 #include <algorithm>
@@ -27,4 +27,4 @@ class GeneralAlgorithm {
 };
 
 
-#endif //OPENGL_GENERAL_ALGORITHM_H
+#endif //MESHPROJECTION_GENERAL_ALGORITHM_H

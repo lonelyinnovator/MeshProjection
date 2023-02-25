@@ -1,7 +1,7 @@
 // Created by lonelyinnovator on 2023/2/21 15:53.
 
-#ifndef OPENGL_CAMERA_H
-#define OPENGL_CAMERA_H
+#ifndef MESHPROJECTION_CAMERA_H
+#define MESHPROJECTION_CAMERA_H
 
 #include <iostream>
 #include <algorithm>
@@ -280,4 +280,4 @@ class Camera {
 };
 
 
-#endif //OPENGL_CAMERA_H
+#endif //MESHPROJECTION_CAMERA_H

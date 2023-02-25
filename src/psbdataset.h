@@ -3,8 +3,8 @@
  * PSB dataset
  */
 
-#ifndef OPENGL_PSBDATASET_H
-#define OPENGL_PSBDATASET_H
+#ifndef MESHPROJECTION_PSBDATASET_H
+#define MESHPROJECTION_PSBDATASET_H
 
 #include <iostream>
 #include <vector>
@@ -64,4 +64,4 @@ class PsbDataset {
 };
 
 
-#endif //OPENGL_PSBDATASET_H
+#endif //MESHPROJECTION_PSBDATASET_H

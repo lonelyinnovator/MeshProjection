@@ -3,8 +3,8 @@
  * Render the OpenGL window
  */
 
-#ifndef OPENGL_RENDER_H
-#define OPENGL_RENDER_H
+#ifndef MESHPROJECTION_RENDER_H
+#define MESHPROJECTION_RENDER_H
 
 #include <iostream>
 #include <string>
@@ -67,7 +67,7 @@ class Render {
 
   /**
    * Render mesh projection.
-   * @param shaded set true to use shaded render; false to use depth map render
+   * @param shaded set true to use shaded render; false to Use depth map render
    */
   void MeshProjectionRender(bool shaded);
 
@@ -184,4 +184,4 @@ class Render {
 };
 
 
-#endif //OPENGL_RENDER_H
+#endif //MESHPROJECTION_RENDER_H

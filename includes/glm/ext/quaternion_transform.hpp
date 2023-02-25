@@ -6,7 +6,7 @@
 ///
 /// Provides transformation functions for quaternion types
 ///
-/// Include <glm/ext/quaternion_transform.hpp> to use the features of this extension.
+/// Include <glm/ext/quaternion_transform.hpp> to Use the features of this extension.
 ///
 /// @see ext_quaternion_float
 /// @see ext_quaternion_double

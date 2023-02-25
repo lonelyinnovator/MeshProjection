@@ -3,8 +3,8 @@
  * Mesh.
  */
 
-#ifndef OPENGL_MESH_H
-#define OPENGL_MESH_H
+#ifndef MESHPROJECTION_MESH_H
+#define MESHPROJECTION_MESH_H
 
 #include <algorithm>
 #include <string>
@@ -191,4 +191,4 @@ class Mesh {
 };
 
 
-#endif //OPENGL_MESH_H
+#endif //MESHPROJECTION_MESH_H

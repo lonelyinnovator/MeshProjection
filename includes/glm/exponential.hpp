@@ -10,7 +10,7 @@
 ///
 /// These all operate component-wise. The description is per component.
 ///
-/// Include <glm/exponential.hpp> to use these core features.
+/// Include <glm/exponential.hpp> to Use these core features.
 
 #pragma once
 

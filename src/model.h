@@ -3,8 +3,8 @@
  * Load all meshes in model
  */
 
-#ifndef OPENGL_MODEL_H
-#define OPENGL_MODEL_H
+#ifndef MESHPROJECTION_MODEL_H
+#define MESHPROJECTION_MODEL_H
 
 #include <string>
 #include <fstream>
@@ -164,4 +164,4 @@ class Model {
 };
 
 
-#endif //OPENGL_MODEL_H
+#endif //MESHPROJECTION_MODEL_H

@@ -3,8 +3,8 @@
  * MeshProjection, to project mesh in multiple views.
  */
 
-#ifndef OPENGL_MESH_PROJECTION_H
-#define OPENGL_MESH_PROJECTION_H
+#ifndef MESHPROJECTION_MESH_PROJECTION_H
+#define MESHPROJECTION_MESH_PROJECTION_H
 
 #include <iostream>
 #include <vector>
@@ -22,7 +22,7 @@ const unsigned int kRollNum = 4;
 const unsigned int kProjCameraNum = 26 * kRollNum;
 
 /**
- * To project mesh on render window in different views(use proj_camera).
+ * To project mesh on render window in different views(Use proj_camera).
  * Example:
  *   MeshProjection mp;
  *   Camera camera = mp.GetNextProjCamera();
@@ -122,4 +122,4 @@ class MeshProjection {
 };
 
 
-#endif //OPENGL_MESH_PROJECTION_H
+#endif //MESHPROJECTION_MESH_PROJECTION_H

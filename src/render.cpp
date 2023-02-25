@@ -61,46 +61,46 @@ void Render::OneCameraRender() {
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      model_shader.use();
+      model_shader.Use();
 
       // set material
       glm::vec3 material_color = Color::White;
-      model_shader.setVec3("material.ambient", material_color);
-      model_shader.setVec3("material.diffuse", material_color);
-      model_shader.setVec3("material.specular", material_color);
-      model_shader.setFloat("material.shininess", 32.0f);
+      model_shader.SetVec3("material.ambient", material_color);
+      model_shader.SetVec3("material.diffuse", material_color);
+      model_shader.SetVec3("material.specular", material_color);
+      model_shader.SetFloat("material.shininess", 32.0f);
       // set light
-      model_shader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
-      model_shader.setVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
-      model_shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
-      model_shader.setVec3("dirLight.direction", camera_.GetFront());
+      model_shader.SetVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+      model_shader.SetVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
+      model_shader.SetVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+      model_shader.SetVec3("dirLight.direction", camera_.GetFront());
       // set view position
-      model_shader.setVec3("viewPos", camera_.GetPosition());
+      model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
       glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()),
                                               screen_width_ * 1.0f / screen_height_,
                                               0.1f, 100.0f);
       glm::mat4 view = camera_.GetViewMatrix();
-      model_shader.setMat4("projection", projection);
-      model_shader.setMat4("view", view);
+      model_shader.SetMat4("projection", projection);
+      model_shader.SetMat4("view", view);
 
       // render the loaded model
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      model_shader.setMat4("model", model);
+      model_shader.SetMat4("model", model);
       all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
-      model_shader.setMat3("normalMatrix", normalMatrix);
+      model_shader.SetMat3("normalMatrix", normalMatrix);
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
     }
   }
 
-  glDeleteProgram(model_shader.ID);
+  glDeleteProgram(model_shader.GetProgramId());
 }
 
 void Render::MeshProjectionRender(bool shaded) {
@@ -157,39 +157,39 @@ void Render::MeshProjectionRender(bool shaded) {
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      model_shader.use();
+      model_shader.Use();
 
       // set material
       glm::vec3 material_color = Color::White;
-      model_shader.setVec3("material.ambient", material_color);
-      model_shader.setVec3("material.diffuse", material_color);
-      model_shader.setVec3("material.specular", material_color);
-      model_shader.setFloat("material.shininess", 32.0f);
+      model_shader.SetVec3("material.ambient", material_color);
+      model_shader.SetVec3("material.diffuse", material_color);
+      model_shader.SetVec3("material.specular", material_color);
+      model_shader.SetFloat("material.shininess", 32.0f);
       // set light
-      model_shader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
-      model_shader.setVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
-      model_shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
-      model_shader.setVec3("dirLight.direction", camera_.GetFront());
+      model_shader.SetVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+      model_shader.SetVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
+      model_shader.SetVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+      model_shader.SetVec3("dirLight.direction", camera_.GetFront());
       // set view position
-      model_shader.setVec3("viewPos", camera_.GetPosition());
+      model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
       glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()),
                                               screen_width_ * 1.0f / screen_height_,
                                               0.1f, 100.0f);
       glm::mat4 view = camera_.GetViewMatrix();
-      model_shader.setMat4("projection", projection);
-      model_shader.setMat4("view", view);
+      model_shader.SetMat4("projection", projection);
+      model_shader.SetMat4("view", view);
 
       // render the loaded model
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      model_shader.setMat4("model", model);
+      model_shader.SetMat4("model", model);
       all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
-      model_shader.setMat3("normalMatrix", normalMatrix);
+      model_shader.SetMat3("normalMatrix", normalMatrix);
 
       // compute depth min max when use DepthMap shader
       if (!shaded) {
@@ -209,19 +209,18 @@ void Render::MeshProjectionRender(bool shaded) {
       }
     }
   }
-
-  glDeleteProgram(model_shader.ID);
+  glDeleteProgram(model_shader.GetProgramId());
 }
 
 void Render::ShadedSegRender() {
   // shader
-  Shader modelShader = Shader(R"(shader\shaded_seg.vs)",
-                              R"(shader\shaded_seg.fs)");
+  Shader model_shader = Shader(R"(shader\shaded_seg.vs)",
+                               R"(shader\shaded_seg.fs)");
 
   // load model and seg
   int seg_num = 0;
 //    std::string model_name[] = {"180"};
-  std::vector<Model> allModels;
+  std::vector<Model> all_models;
 //    for (auto &name: model_name) {
 //        std::string model_path = PsbDataset::ModelDir + name + ".off";
 //        std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::SegDir, name, seg_num);
@@ -230,21 +229,21 @@ void Render::ShadedSegRender() {
   for (auto &name: PsbDataset::GetAllModelName()) {
     std::string model_path = PsbDataset::GetModelDir() + name + ".off";
     std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
-    allModels.emplace_back(Model(model_path, seg_path));
+    all_models.emplace_back(Model(model_path, seg_path));
   }
 
-  MeshProjection meshProjection;
+  MeshProjection mesh_projection;
 
-  for (int i = 0; i < allModels.size(); ++i) {
+  for (int i = 0; i < all_models.size(); ++i) {
 //        glfwSetWindowShouldClose(window, false);
     int cnt = 1, repeat_num = 2;
     while (!glfwWindowShouldClose(window_)) {
       // get mesh projection camera
       if (cnt % (repeat_num + 1) == 0) {
         cnt = 1;
-        auto success = meshProjection.GetNextProjCamera(camera_);
+        auto success = mesh_projection.GetNextProjCamera(camera_);
         if (!success) {
-          meshProjection.ResetCurrentCameraIndex();
+          mesh_projection.ResetCurrentCameraIndex();
           break;
         }
       } else {
@@ -260,56 +259,57 @@ void Render::ShadedSegRender() {
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      modelShader.use();
+      model_shader.Use();
 
       // set all colors
       for (int j = 0; j < Color::GetAllColorsSize(); ++j) {
         glm::vec3 tmp(Color::AllColors[j]);
-        modelShader.setVec3(std::format("allColors[{}]", j), tmp);
+        model_shader.SetVec3(std::format("allColors[{}]", j), tmp);
       }
 
       // set material
 //            glm::vec3 material_color = Color::Maroon;
       glm::vec3 material_color = Color::White;
-      modelShader.setVec3("material.ambient", material_color);
-      modelShader.setVec3("material.diffuse", material_color);
-      modelShader.setVec3("material.specular", material_color);
-      modelShader.setFloat("material.shininess", 32.0f);
+      model_shader.SetVec3("material.ambient", material_color);
+      model_shader.SetVec3("material.diffuse", material_color);
+      model_shader.SetVec3("material.specular", material_color);
+      model_shader.SetFloat("material.shininess", 32.0f);
       // set light
-      modelShader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
-      modelShader.setVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
-      modelShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
-      modelShader.setVec3("dirLight.direction", camera_.GetFront());
+      model_shader.SetVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+      model_shader.SetVec3("dirLight.diffuse", 0.6f, 0.6f, 0.6f);
+      model_shader.SetVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+      model_shader.SetVec3("dirLight.direction", camera_.GetFront());
       // set view position
-      modelShader.setVec3("viewPos", camera_.GetPosition());
+      model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
       glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()), kScreenWidth * 1.0f / kScreenHeight,
                                               0.1f, 100.0f);
       glm::mat4 view = camera_.GetViewMatrix();
-      modelShader.setMat4("projection", projection);
-      modelShader.setMat4("view", view);
+      model_shader.SetMat4("projection", projection);
+      model_shader.SetMat4("view", view);
 
       // render the loaded model
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      modelShader.setMat4("model", model);
-      allModels[i].Draw(modelShader);
+      model_shader.SetMat4("model", model);
+      all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
-      modelShader.setMat3("normalMatrix", normalMatrix);
+      model_shader.SetMat3("normalMatrix", normalMatrix);
 
       // set max seg class
-      modelShader.setInt("maxSegClass", allModels[i].GetMaxSegClass());
+      model_shader.SetInt("maxSegClass", all_models[i].GetMaxSegClass());
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
 
-      meshProjection.ProjSnapshot(PsbDataset::GetImageDir() + allModels[i].GetName(), "gt",
-                                  kScreenWidth, kScreenHeight, true);
+      mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "gt",
+                                   kScreenWidth, kScreenHeight, true);
     }
   }
+  glDeleteProgram(model_shader.GetProgramId());
 }
 
 const Camera &Render::GetCamera() {
@@ -436,10 +436,10 @@ void Render::ComputeDepthMinMax(Shader &shader, Model &ourModel, glm::mat4 &proj
       zMax = std::max(zMax, z);
     }
   }
-  shader.setFloat("zMin", zMin);
-  shader.setFloat("zMax", zMax);
-  shader.setFloat("grayMin", 0.2f);
-  shader.setFloat("grayMax", 0.8f);
+  shader.SetFloat("zMin", zMin);
+  shader.SetFloat("zMax", zMax);
+  shader.SetFloat("grayMin", 0.2f);
+  shader.SetFloat("grayMax", 0.8f);
 }
 
 
