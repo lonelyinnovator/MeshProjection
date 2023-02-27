@@ -1,5 +1,5 @@
 # MeshProjection
-Project 3D mesh from multiple different camera views into 2D images.
+Project 3D mesh from multiple different camera perspectives into 2D images.
 
 <p>
 <img src="doc/gt_0_0.png" width="30%">
