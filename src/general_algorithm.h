@@ -13,6 +13,9 @@
 #include <string>
 #include <map>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 /**
  * General algorithm.
  */
@@ -33,6 +36,15 @@ class GeneralAlgorithm {
    * @return split sub string
    */
   static std::vector<std::string> Split(const std::string &in_str, char delim = '\n');
+
+  static float Cross2d(glm::vec3 v1, glm::vec3 v2);
+
+  static float Cross2d(glm::vec2 v1, glm::vec2 v2);
+
+  static bool IsInsideTriangle(glm::vec2 &point, std::vector<glm::vec2> &triangle_vertices);
+
+  static std::tuple<float, float, float>
+  ComputeBaryCentric2d(glm::vec2 &point, std::vector<glm::vec2> &triangle_vertices);
 };
 
 

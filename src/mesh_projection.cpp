@@ -13,11 +13,16 @@ MeshProjection::MeshProjection(float radius) {
 
 MeshProjection::~MeshProjection() = default;
 
+std::string MeshProjection::GetCameraViewFilename() const {
+  return std::format("{}_{}", std::to_string(current_camera_index_ / kRollNum),
+                     std::to_string(current_camera_index_ % kRollNum));
+}
+
+
 void MeshProjection::ProjSnapshot(const std::string &output_dir, const std::string &prefix, int width, int height,
-                                  bool is_rgb) {
+                                  bool is_rgb) const {
   if (current_camera_index_ >= 0) {
-    std::string filename = std::format("{}_{}_{}.png", prefix, std::to_string(current_camera_index_ / kRollNum),
-                                       std::to_string(current_camera_index_ % kRollNum));
+    std::string filename = std::format("{}_{}.png", prefix, GetCameraViewFilename());
     Camera::Snapshot(filename, std::format(R"({}\{}\)", output_dir, prefix), width, height, is_rgb);
   }
 }
@@ -40,7 +45,7 @@ void MeshProjection::ResetCurrentCameraIndex() {
 }
 
 bool MeshProjection::GetNextProjCamera(Camera &out_camera) {
-  current_camera_index_++;
+  ++current_camera_index_;
   if (current_camera_index_ >= kProjCameraNum) {
     return false;
   }
@@ -101,6 +106,7 @@ glm::vec3 MeshProjection::ComputeCameraPosition(glm::vec3 center_point, float ra
   pos.z = center_point.z - radius * cos(glm::radians(pitch)) * sin(glm::radians(yaw));
   return pos;
 }
+
 
 
 

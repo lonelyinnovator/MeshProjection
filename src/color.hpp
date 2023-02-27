@@ -28,8 +28,6 @@ class Color {
   constexpr static const glm::vec3 Magenta = glm::vec3(255.0f, 0.0f, 255.0f) / 255.0f;
   constexpr static const glm::vec3 Violet = glm::vec3(238.0f, 130.0f, 238.0f) / 255.0f;
 
-  constexpr static const glm::vec3 White = glm::vec3(255.0f, 255.0f, 255.0f) / 255.0f;
-  constexpr static const glm::vec3 Black = glm::vec3(0.0f, 0.0f, 0.0f) / 255.0f;
   constexpr static const glm::vec3 Snow = glm::vec3(255.0f, 250.0f, 250.0f) / 255.0f;
   constexpr static const glm::vec3 GhostWhite = glm::vec3(248.0f, 248.0f, 255.0f) / 255.0f;
   constexpr static const glm::vec3 WhiteSmoke = glm::vec3(245.0f, 245.0f, 245.0f) / 255.0f;
@@ -56,19 +54,21 @@ class Color {
   constexpr static const glm::vec3 Tomato = glm::vec3(255.0f, 99.0f, 71.0f) / 255.0f;
   constexpr static const glm::vec3 OrangeRed = glm::vec3(255.0f, 69.0f, 0.0f) / 255.0f;
   constexpr static const glm::vec3 DarkOrchid = glm::vec3(153.0f, 50.0f, 204.0f) / 255.0f;
+  constexpr static const glm::vec3 White = glm::vec3(255.0f, 255.0f, 255.0f) / 255.0f;
+  constexpr static const glm::vec3 Black = glm::vec3(0.0f, 0.0f, 0.0f) / 255.0f;
 
 
   // all colors
   constexpr static const glm::vec3 AllColors[]{
-      Red, Blue, Green, Yellow, Cyan, Orange,
-      Purple, Pink, Grey, Gold, Brown,
-      HotPink, DeepPink, VioletRed, Maroon, Magenta,
-      Violet, White, Black, Snow, GhostWhite,
-      WhiteSmoke, PeachPuff, LemonChiffon, Lavender, LightSlateGray,
-      LightGray, CornflowerBlue, DeepSkyBlue, LightSkyBlue, Aquamarine,
-      DarkGreen, MediumSeaGreen, SpringGreen, GreenYellow, YellowGreen,
-      LightYellow, DarkGoldenrod, RosyBrown, IndianRed, Salmon,
-      Coral, Tomato, OrangeRed, DarkOrchid,
+      Red, Blue, Green, Yellow, Cyan,
+      Orange,Purple, Pink, Grey, Gold,
+      Brown,HotPink, DeepPink, VioletRed, Maroon,
+      Magenta,Violet, Snow, GhostWhite, WhiteSmoke,
+      PeachPuff,LemonChiffon, Lavender, LightSlateGray, LightGray,
+      CornflowerBlue,DeepSkyBlue, LightSkyBlue, Aquamarine, DarkGreen,
+      MediumSeaGreen,SpringGreen, GreenYellow, YellowGreen, LightYellow,
+      DarkGoldenrod,RosyBrown, IndianRed, Salmon, Coral,
+      Tomato,OrangeRed, DarkOrchid, White, Black,
   };
 
   /**

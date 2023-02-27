@@ -26,6 +26,12 @@ const std::string &PsbDataset::GetSegDir() {
   return seg_dir_;
 }
 
+
+const std::string &PsbDataset::GetPixelDir() {
+  return pixel_dir_;
+}
+
+
 const std::string PsbDataset::data_dir_ = R"(E:\Work\pycharmWork\3DMeshCode\CLIP4Mesh\data\psb\)";
 
 const std::string PsbDataset::image_dir_ = PsbDataset::data_dir_ + R"(images\)";
@@ -33,4 +39,6 @@ const std::string PsbDataset::image_dir_ = PsbDataset::data_dir_ + R"(images\)";
 const std::string PsbDataset::model_dir_ = PsbDataset::data_dir_ + R"(off\)";
 
 const std::string PsbDataset::seg_dir_ = PsbDataset::data_dir_ + R"(seg\Benchmark\)";
+
+const std::string PsbDataset::pixel_dir_ = PsbDataset::data_dir_ + R"(pixel\)";
 

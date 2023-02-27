@@ -16,10 +16,11 @@ int main(int argc, char *argv[]) {
 
   try {
     Render render;
-    render.OneCameraRender();
+
+//    render.OneCameraRender();
 
 //    render shaded
-//    render.MeshProjectionRender(true);
+    render.MeshProjectionRender(true);
 //    render depth map
 //    render.MeshProjectionRender(false);
 

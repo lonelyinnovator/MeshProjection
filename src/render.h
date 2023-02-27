@@ -61,6 +61,8 @@ class Render {
    */
   ~Render();
 
+  void RasterizationFromScratch(const Model &one_model, const glm::mat4 &total_matrix, const MeshProjection &mp) const;
+
   /**
    * Render with only one camera.
    */

@@ -24,6 +24,72 @@ Render::Render(int width, int height, int multi_sample_num) {
 
 Render::~Render() = default;
 
+
+void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &total_matrix,
+                                      const MeshProjection &mp) const {
+  std::vector<Vertex> mesh_vertices;
+  int min_h, max_h, min_w, max_w;
+  float tmp;
+  for (auto &mesh: one_model.GetMeshes()) {
+    std::vector<std::vector<std::pair<int, float>>> tri_per_pixel(screen_height_,
+                                                                  std::vector<std::pair<int, float>>(screen_width_,
+                                                                                                     {-1, 1.0f}));
+    mesh_vertices = mesh.GetVertices();
+    // total transformations
+    for (auto &vertex: mesh_vertices) {
+      glm::vec4 p = total_matrix * glm::vec4(vertex.position, 1.0f);
+      vertex.position = glm::vec3(p / p.w);
+      tmp = vertex.position.x;
+//      vertex.position.x = static_cast<float>(screen_height_) - round(vertex.position.y);
+      vertex.position.x = static_cast<float>(screen_height_) - vertex.position.y - 1;
+//      vertex.position.y = round(tmp);
+      vertex.position.y = tmp;
+//      std::cout << vertex.position.z << std::endl;
+    }
+    auto mesh_triangles = mesh.GetTriangles();
+    // rasterization
+    for (int k = 0; k < mesh_triangles.size(); ++k) {
+      auto v1 = mesh_vertices[mesh_triangles[k].vertex_idx1].position;
+      auto v2 = mesh_vertices[mesh_triangles[k].vertex_idx2].position;
+      auto v3 = mesh_vertices[mesh_triangles[k].vertex_idx3].position;
+      min_h = static_cast<int>(round(std::min({v1.x, v2.x, v3.x})));
+      max_h = static_cast<int>(round(std::max({v1.x, v2.x, v3.x})));
+      min_w = static_cast<int>(round(std::min({v1.y, v2.y, v3.y})));
+      max_w = static_cast<int>(round(std::max({v1.y, v2.y, v3.y})));
+//        std::cout << std::format("{} {} {} {}", min_h, max_h, min_w, max_w) << "; ";
+      std::vector<glm::vec2> tv{glm::vec2(v1), glm::vec2(v2), glm::vec2(v3)};
+      for (int i = min_h; i <= max_h; ++i) {
+        for (int j = min_w; j <= max_w; ++j) {
+          glm::vec2 point = glm::vec2(i, j);
+          if (GeneralAlgorithm::IsInsideTriangle(point, tv)) {
+            auto [alpha, beta, gamma] = GeneralAlgorithm::ComputeBaryCentric2d(point, tv);
+            float z = alpha * v1.z + beta * v2.z + gamma * v3.z;
+            if (tri_per_pixel[i][j].second > z) {
+              tri_per_pixel[i][j].first = k;
+              tri_per_pixel[i][j].second = z;
+            }
+          }
+        }
+      }
+    }
+    // write tri_per_pixel to csv file
+    std::string file_dir = PsbDataset::GetPixelDir() + one_model.GetName() + R"(\)";
+    if (!std::filesystem::exists(file_dir)) {
+      std::filesystem::create_directories(file_dir);
+    }
+    FileProcess file_process(std::format("{}pixel_{}.csv", file_dir, mp.GetCameraViewFilename()), std::ios::out);
+    for (int i = 0; i < screen_height_; ++i) {
+      for (int j = 0; j < screen_width_; ++j) {
+        if (j != 0) file_process.Write(",");
+        file_process.Write(std::to_string(tri_per_pixel[i][j].first));
+      }
+      file_process.Write("\n");
+    }
+    file_process.CloseFile();
+  }
+
+}
+
 void Render::OneCameraRender() {
 
   glfwSetCursorPosCallback(window_, OnMouseMove);
@@ -41,7 +107,6 @@ void Render::OneCameraRender() {
   int seg_num = 0;
   for (auto &name: model_name) {
     std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
-    std::cout << seg_path << std::endl;
     all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off", seg_path));
   }
 //    for (auto &name: PsbDataset::GetAllModelName()) {
@@ -153,16 +218,16 @@ void Render::MeshProjectionRender(bool shaded) {
   }
 
   // load model by model name
-  std::string model_name[] = {"21"};
+  std::string model_name[] = {"1"};
   std::vector<Model> all_models;
   for (auto &name: model_name) {
     all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
   }
-//    for (auto &name: PsbDataset::GetAllModelName()) {
-//        all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
-//    }
+//  for (auto &name: PsbDataset::GetAllModelName()) {
+//    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
+//  }
 
-  MeshProjection meshProjection;
+  MeshProjection mesh_projection;
 
   // mvp matrix
   glm::mat4 projection(1.0f), view(1.0f), model(1.0f), model_view_projection(1.0f);
@@ -170,19 +235,30 @@ void Render::MeshProjectionRender(bool shaded) {
   // traverse all the models
   for (int i = 0; i < all_models.size(); ++i) {
     // repeat render every camera repeat_num times
-    int cnt = 1, repeat_num = 2;
+//    int cnt = 1, repeat_num = 2;
     while (!glfwWindowShouldClose(window_)) {
-      // get mesh projection camera
-      if (cnt % (repeat_num + 1) == 0) {
-        cnt = 1;
-        auto success = meshProjection.GetNextProjCamera(camera_);
-        if (!success) {
-          meshProjection.ResetCurrentCameraIndex();
-//                glfwSetWindowShouldClose(window, true);
-          break;
-        }
-      } else {
-        cnt++;
+//      // get mesh projection camera
+//      if (cnt % (repeat_num + 1) == 0) {
+//        cnt = 1;
+//        auto success = mesh_projection.GetNextProjCamera(camera_);
+//        if (!success) {
+//          mesh_projection.ResetCurrentCameraIndex();
+////                glfwSetWindowShouldClose(window, true);
+//          break;
+//        }
+//      } else {
+//        cnt++;
+//      }
+      auto success = mesh_projection.GetNextProjCamera(camera_);
+      // render finished
+      if (!success) {
+        mesh_projection.ResetCurrentCameraIndex();
+        break;
+      }
+      // avoid OpenGL render too quickly
+      if (mesh_projection.GetCurrentCameraIndex() == -1) {
+        mesh_projection.ResetCurrentCameraIndex();
+        continue;
       }
 
       // per frame time logic
@@ -190,7 +266,7 @@ void Render::MeshProjectionRender(bool shaded) {
       delta_time_ = current_frame - last_frame_;
       last_frame_ = current_frame;
 
-//            process_input(window);
+//      process_input(window_);
 
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -236,15 +312,21 @@ void Render::MeshProjectionRender(bool shaded) {
       glfwSwapBuffers(window_);
       glfwPollEvents();
 
+      // compute and save triangle id on every pixel
+      RasterizationFromScratch(all_models[i], viewport_matrix_ * model_view_projection, mesh_projection);
+
       // snapshot
-      if (shaded) {
-        meshProjection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "shaded",
-                                    screen_width_, screen_height_, false);
-      } else {
-        meshProjection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "depth",
-                                    screen_width_, screen_height_, false);
-      }
+//      if (shaded) {
+//        mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "shaded",
+//                                     screen_width_, screen_height_, false);
+//      } else {
+//        mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "depth",
+//                                     screen_width_, screen_height_, false);
+//      }
     }
+  }
+  for (auto &m: all_models) {
+    m.DeleteAllMeshesObject();
   }
   glDeleteProgram(model_shader.GetProgramId());
 }
@@ -347,6 +429,9 @@ void Render::ShadedSegRender() {
       mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "gt",
                                    kScreenWidth, kScreenHeight, true);
     }
+  }
+  for (auto &m: all_models) {
+    m.DeleteAllMeshesObject();
   }
   glDeleteProgram(model_shader.GetProgramId());
 }
@@ -503,3 +588,4 @@ float Render::last_x_ = kScreenWidth / 2.0f;
 float Render::last_y_ = kScreenHeight / 2.0f;
 
 Camera Render::camera_{};
+

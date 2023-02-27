@@ -47,6 +47,12 @@ class MeshProjection {
   ~MeshProjection();
 
   /**
+   * Get filename from different camera view
+   * @return filename: {current_camera_index_ / kRollNum}_{current_camera_index_ % kRollNum}
+   */
+  [[nodiscard]] std::string GetCameraViewFilename() const;
+
+  /**
    * Snapshot current rendered window to image.
    * @param output_dir image output dir
    * @param prefix image prefix
@@ -54,7 +60,7 @@ class MeshProjection {
    * @param height image height
    * @param is_rgb set true to save rgb image; false to save gray image
    */
-  void ProjSnapshot(const std::string &output_dir, const std::string &prefix, int width, int height, bool is_rgb);
+  void ProjSnapshot(const std::string &output_dir, const std::string &prefix, int width, int height, bool is_rgb) const;
 
   /**
    * Get radius.

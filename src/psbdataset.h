@@ -49,6 +49,12 @@ class PsbDataset {
    */
   static const std::string &GetSegDir();
 
+  /**
+   * Get pixel directory.
+   * @return pixel directory
+   */
+  static const std::string &GetPixelDir();
+
  private:
   // absolute data dir
   static const std::string data_dir_;
@@ -61,6 +67,9 @@ class PsbDataset {
 
   // seg dir
   static const std::string seg_dir_;
+
+  // pixel
+  static const std::string pixel_dir_;
 };
 
 
