@@ -25,6 +25,10 @@ Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, fl
   SetRoll(roll);
 }
 
+
+Camera::~Camera() = default;
+
+
 glm::mat4 Camera::GetViewMatrix() const {
   // use camera position, target position, word up vector to create LookAt matrix
   return glm::lookAt(position_, position_ + front_, up_);
@@ -83,6 +87,7 @@ void Camera::Snapshot(const std::string &filename, const std::string &output_dir
   glReadPixels(0, 0, img.cols, img.rows, GL_BGR, GL_UNSIGNED_BYTE, img.data);
   // flip image
   cv::Mat flipped;
+  // flip top-bottom
   cv::flip(img, flipped, 0);
   // not rgb image, use gray image
   if (!is_rgb) {

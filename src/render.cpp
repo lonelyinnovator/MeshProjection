@@ -22,9 +22,7 @@ Render::Render(int width, int height, int multi_sample_num) {
   InitRender();
 }
 
-Render::~Render() {
-
-}
+Render::~Render() = default;
 
 void Render::OneCameraRender() {
 
@@ -35,17 +33,23 @@ void Render::OneCameraRender() {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   // shader
-  Shader model_shader = Shader(R"(shader\shaded.vs)", R"(shader\shaded.fs)");
+  Shader model_shader = Shader(R"(shader\shaded.vert)", R"(shader\shaded.frag)");
 
   // load model by model name
-  std::string model_name[] = {"21"};
+  std::string model_name[] = {"1"};
   std::vector<Model> all_models;
+  int seg_num = 0;
   for (auto &name: model_name) {
-    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
+    std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
+    std::cout << seg_path << std::endl;
+    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off", seg_path));
   }
 //    for (auto &name: PsbDataset::GetAllModelName()) {
 //        allModels.emplace_back(Model(PsbDataset::ModelDir + name + ".off"));
 //    }
+
+  // mvp matrix
+  glm::mat4 projection(1.0f), view(1.0f), model(1.0f), model_view_projection(1.0f);
 
   // traverse all the models
   for (int i = 0; i < all_models.size(); ++i) {
@@ -78,28 +82,59 @@ void Render::OneCameraRender() {
       model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
-      glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()),
-                                              screen_width_ * 1.0f / screen_height_,
-                                              0.1f, 100.0f);
-      glm::mat4 view = camera_.GetViewMatrix();
-      model_shader.SetMat4("projection", projection);
-      model_shader.SetMat4("view", view);
-
-      // render the loaded model
-      glm::mat4 model = glm::mat4(1.0f);
+      projection = glm::perspective(glm::radians(camera_.GetZoom()),
+                                    static_cast<float>(screen_width_) / static_cast<float>(screen_height_),
+                                    0.1f, 100.0f);
+      view = camera_.GetViewMatrix();
+      // model transformations
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      model_shader.SetMat4("model", model);
-      all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
       model_shader.SetMat3("normalMatrix", normalMatrix);
+      // set mvp matrix
+      model_view_projection = projection * view * model;
+      model_shader.SetMat4("modelViewProjection", model_view_projection);
+
+      // draw model
+      all_models[i].Draw(model_shader);
+
+      float w_min = static_cast<float>(screen_width_), w_max = -1;
+      float h_min = static_cast<float>(screen_height_), h_max = -1;
+      float x, y;
+
+      FileProcess file_process(PsbDataset::GetDataDir() + "test.csv", std::ios::out);
+      file_process.Write("x,y\n");
+      for (auto &mesh: all_models[i].GetMeshes()) {
+//        Vertex v = mesh.GetVertices()[100];
+        for (auto &v: mesh.GetVertices()) {
+          glm::vec4 p = viewport_matrix_ * model_view_projection * glm::vec4(v.position, 1.0f);
+          p /= p.w;
+          x = round(p.x);
+          y = round(p.y);
+          w_min = std::min(w_min, x);
+          h_min = std::min(h_min, x);
+          w_max = std::max(w_max, y);
+          h_max = std::max(h_max, y);
+//          std::cout << std::format("{} {} {}", x, y, p.z) << std::endl;
+//          ofs << std::format("{},{}", static_cast<float>(screen_height_) - y, x) << std::endl;
+          file_process.Write(std::format("{},{}\n", static_cast<float>(screen_height_) - y, x));
+        }
+      }
+      file_process.CloseFile();
+
+//      std::cout << std::format("w_min: {}, w_max: {}, h_min: {}, h_max:{}", w_min, w_max, h_min, h_max) << std::endl;
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
+
+      Camera::Snapshot("test.png", PsbDataset::GetDataDir(), screen_width_, screen_height_, true);
+//      break;
     }
   }
-
+  for (auto &m: all_models) {
+    m.DeleteAllMeshesObject();
+  }
   glDeleteProgram(model_shader.GetProgramId());
 }
 
@@ -112,9 +147,9 @@ void Render::MeshProjectionRender(bool shaded) {
 //    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   // shader
-  Shader model_shader = Shader(R"(shader\shaded.vs)", R"(shader\shaded.fs)");
+  Shader model_shader = Shader(R"(shader\shaded.vert)", R"(shader\shaded.frag)");
   if (!shaded) {
-    model_shader = Shader(R"(shader\depth_map.vs)", R"(shader\depth_map.fs)");
+    model_shader = Shader(R"(shader\depth_map.vert)", R"(shader\depth_map.frag)");
   }
 
   // load model by model name
@@ -124,10 +159,13 @@ void Render::MeshProjectionRender(bool shaded) {
     all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
   }
 //    for (auto &name: PsbDataset::GetAllModelName()) {
-//        allModels.emplace_back(Model(PsbDataset::ModelDir + name + ".off"));
+//        all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
 //    }
 
   MeshProjection meshProjection;
+
+  // mvp matrix
+  glm::mat4 projection(1.0f), view(1.0f), model(1.0f), model_view_projection(1.0f);
 
   // traverse all the models
   for (int i = 0; i < all_models.size(); ++i) {
@@ -174,22 +212,21 @@ void Render::MeshProjectionRender(bool shaded) {
       model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
-      glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()),
-                                              screen_width_ * 1.0f / screen_height_,
-                                              0.1f, 100.0f);
-      glm::mat4 view = camera_.GetViewMatrix();
-      model_shader.SetMat4("projection", projection);
-      model_shader.SetMat4("view", view);
-
-      // render the loaded model
-      glm::mat4 model = glm::mat4(1.0f);
+      projection = glm::perspective(glm::radians(camera_.GetZoom()),
+                                    static_cast<float>(screen_width_) / static_cast<float>(screen_height_),
+                                    0.1f, 100.0f);
+      view = camera_.GetViewMatrix();
+      // model transformations
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      model_shader.SetMat4("model", model);
-      all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
       model_shader.SetMat3("normalMatrix", normalMatrix);
+      // set mvp matrix
+      model_view_projection = projection * view * model;
+      model_shader.SetMat4("modelViewProjection", model_view_projection);
+
+      all_models[i].Draw(model_shader);
 
       // compute depth min max when use DepthMap shader
       if (!shaded) {
@@ -214,28 +251,30 @@ void Render::MeshProjectionRender(bool shaded) {
 
 void Render::ShadedSegRender() {
   // shader
-  Shader model_shader = Shader(R"(shader\shaded_seg.vs)",
-                               R"(shader\shaded_seg.fs)");
+  Shader model_shader = Shader(R"(shader\shaded_seg.vert)",
+                               R"(shader\shaded_seg.frag)");
 
   // load model and seg
   int seg_num = 0;
-//    std::string model_name[] = {"180"};
+  std::string model_name[] = {"21"};
   std::vector<Model> all_models;
-//    for (auto &name: model_name) {
-//        std::string model_path = PsbDataset::ModelDir + name + ".off";
-//        std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::SegDir, name, seg_num);
-//        allModels.emplace_back(Model(model_path, seg_path));
-//    }
-  for (auto &name: PsbDataset::GetAllModelName()) {
+  for (auto &name: model_name) {
     std::string model_path = PsbDataset::GetModelDir() + name + ".off";
     std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
     all_models.emplace_back(Model(model_path, seg_path));
   }
+//  for (auto &name: PsbDataset::GetAllModelName()) {
+//    std::string model_path = PsbDataset::GetModelDir() + name + ".off";
+//    std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
+//    all_models.emplace_back(Model(model_path, seg_path));
+//  }
 
   MeshProjection mesh_projection;
 
+  // mvp matrix
+  glm::mat4 projection(1.0f), view(1.0f), model(1.0f), model_view_projection(1.0f);
+
   for (int i = 0; i < all_models.size(); ++i) {
-//        glfwSetWindowShouldClose(window, false);
     int cnt = 1, repeat_num = 2;
     while (!glfwWindowShouldClose(window_)) {
       // get mesh projection camera
@@ -283,24 +322,24 @@ void Render::ShadedSegRender() {
       model_shader.SetVec3("viewPos", camera_.GetPosition());
 
       // view/projection transformations
-      glm::mat4 projection = glm::perspective(glm::radians(camera_.GetZoom()), kScreenWidth * 1.0f / kScreenHeight,
-                                              0.1f, 100.0f);
-      glm::mat4 view = camera_.GetViewMatrix();
-      model_shader.SetMat4("projection", projection);
-      model_shader.SetMat4("view", view);
-
-      // render the loaded model
-      glm::mat4 model = glm::mat4(1.0f);
+      projection = glm::perspective(glm::radians(camera_.GetZoom()),
+                                    static_cast<float>(screen_width_) / static_cast<float>(screen_height_),
+                                    0.1f, 100.0f);
+      view = camera_.GetViewMatrix();
+      // model transformations
       model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-      model_shader.SetMat4("model", model);
-      all_models[i].Draw(model_shader);
       // normal matrix
       glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
       model_shader.SetMat3("normalMatrix", normalMatrix);
+      // set mvp matrix
+      model_view_projection = projection * view * model;
+      model_shader.SetMat4("modelViewProjection", model_view_projection);
 
       // set max seg class
       model_shader.SetInt("maxSegClass", all_models[i].GetMaxSegClass());
+
+      all_models[i].Draw(model_shader);
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
@@ -334,6 +373,10 @@ GLFWwindow *Render::GetWindow() const {
 
 int Render::GetMultiSampleNum() const {
   return multi_sample_num_;
+}
+
+glm::mat4 &Render::GetViewportMatrix() {
+  return viewport_matrix_;
 }
 
 
@@ -418,6 +461,15 @@ void Render::InitRender() {
   if (multi_sample_num_ != 0) {
     glEnable(GL_MULTISAMPLE);
   }
+
+  // set viewport matrix with screen width and screen height
+  viewport_matrix_ = {
+      static_cast<float>(screen_width_) / 2.0f, 0.0f, 0.0f, 0.0f,
+      0.0f, static_cast<float>(screen_height_) / 2.0f, 0.0f, 0.0f,
+      0.0f, 0.0f, 1.0f, 0.0f,
+      (static_cast<float>(screen_width_) - 1.0f) / 2.0f, (static_cast<float>(screen_height_) - 1.0f) / 2.0f, 0.0f, 1.0f
+  };
+
 }
 
 

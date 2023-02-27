@@ -74,10 +74,15 @@ class Camera {
          float roll = kRoll);
 
   /**
+   * Deconstruct
+   */
+  ~Camera();
+
+  /**
    * Get camera view matrix (lookAt matrix).
    * @return camera view matrix
    */
-  glm::mat4 GetViewMatrix() const;
+  [[nodiscard]] glm::mat4 GetViewMatrix() const;
 
   /**
    * Use keyboard to move camera.
@@ -143,7 +148,7 @@ class Camera {
    * Get camera yaw angle.
    * @return camera yaw angle
    */
-  float GetYaw() const;
+  [[nodiscard]] float GetYaw() const;
 
   /**
    * Set camera yaw angle.
@@ -155,7 +160,7 @@ class Camera {
    * Get pitch angle.
    * @return camera pitch angle
    */
-  float GetPitch() const;
+  [[nodiscard]] float GetPitch() const;
 
   /**
    * Set camera pitch angle.
@@ -167,7 +172,7 @@ class Camera {
    * Get camera roll angle.
    * @return camera roll angle
    */
-  float GetRoll() const;
+  [[nodiscard]] float GetRoll() const;
 
   /**
    * Set camera roll.
@@ -203,7 +208,7 @@ class Camera {
    * Get camera move speed.
    * @return camera move speed
    */
-  float GetMovementSpeed() const;
+  [[nodiscard]] float GetMovementSpeed() const;
 
   /**
    * Set camera move speed.
@@ -215,7 +220,7 @@ class Camera {
    * Get mouse sensitivity(mouse move factor).
    * @return mouse sensitivity
    */
-  float GetMouseSensitivity() const;
+  [[nodiscard]] float GetMouseSensitivity() const;
 
   /**
    * Set mouse sensitivity.
@@ -227,7 +232,7 @@ class Camera {
    * Get camera zoom.
    * @return camera zoom
    */
-  float GetZoom() const;
+  [[nodiscard]] float GetZoom() const;
 
   /**
    * Set camera zoom.

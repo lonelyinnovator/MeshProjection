@@ -23,6 +23,8 @@
 
 #include "mesh.h"
 #include "shader.h"
+#include "file_process.h"
+#include "user_exception.hpp"
 
 
 /**
@@ -49,7 +51,12 @@ class Model {
    * @param segPath
    * @param gamma
    */
-  Model(const std::string &model_path, const std::string &segPath = "", bool gamma = false);
+  explicit Model(const std::string &model_path, const std::string &segPath = "", bool gamma = false);
+
+  /**
+   * Deconstruct
+   */
+  ~Model();
 
   /**
    * Draws the model, and thus all its meshes.
@@ -58,52 +65,57 @@ class Model {
   void Draw(Shader &shader);
 
   /**
+   * Delete object of all mesh
+   */
+  void DeleteAllMeshesObject();
+
+  /**
    * Get loaded textures in model.
    * @return loaded textures in model.
    */
-  const std::vector<Texture> &GetTexturesLoaded() const;
+  [[nodiscard]] const std::vector<Texture> &GetTexturesLoaded() const;
 
   /**
    * Get all meshes in model.
    * @return all meshes in model
    */
-  const std::vector<Mesh> &GetMeshes() const;
+  [[nodiscard]] const std::vector<Mesh> &GetMeshes() const;
 
   /**
    * Get model directory.
    * @return model directory
    */
-  const std::string &GetDirectory() const;
+  [[nodiscard]] const std::string &GetDirectory() const;
 
   /**
    * Get model name(e.g. 21).
    * @return model name
    */
-  const std::string &GetName() const;
+  [[nodiscard]] const std::string &GetName() const;
 
   /**
    * Get model suffix(e.g. .off).
    * @return model suffix
    */
-  const std::string &GetSuffix() const;
+  [[nodiscard]] const std::string &GetSuffix() const;
 
   /**
    * Get model segmentation result.
    * @return model segmentation result
    */
-  const std::vector<int> &GetModelSeg() const;
+  [[nodiscard]] const std::vector<int> &GetModelSeg() const;
 
   /**
    * Get max segmentation class in segmentation result.
    * @return max segmentation class
    */
-  int GetMaxSegClass() const;
+  [[nodiscard]] int GetMaxSegClass() const;
 
   /**
    * Get gamma_correction.
    * @return gamma_correction
    */
-  bool GetGammaCorrection() const;
+  [[nodiscard]] bool GetGammaCorrection() const;
 
  private:
 

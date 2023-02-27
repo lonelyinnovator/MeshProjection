@@ -1,7 +1,7 @@
 // Created by lonelyinnovator on 2023/2/23 22:24.
 
-#ifndef MESHPROJECTION_COLOR_H
-#define MESHPROJECTION_COLOR_H
+#ifndef MESHPROJECTION_COLOR_HPP
+#define MESHPROJECTION_COLOR_HPP
 
 #include <iostream>
 #include <glm/glm.hpp>
@@ -89,4 +89,4 @@ class Color {
 };
 
 
-#endif //MESHPROJECTION_COLOR_H
+#endif //MESHPROJECTION_COLOR_HPP

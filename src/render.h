@@ -21,6 +21,7 @@
 #include "model.h"
 #include "psbdataset.h"
 #include "color.hpp"
+#include "file_process.h"
 
 // opengl screen width
 const int kScreenWidth = 800;
@@ -92,25 +93,27 @@ class Render {
    * Get screen width.
    * @return screen width
    */
-  int GetScreenWidth() const;
+  [[nodiscard]] int GetScreenWidth() const;
 
   /**
    * Get screen height.
    * @return screen height
    */
-  int GetScreenHeight() const;
+  [[nodiscard]] int GetScreenHeight() const;
 
   /**
    * Get glfw window.
    * @return glfw window
    */
-  GLFWwindow *GetWindow() const;
+  [[nodiscard]] GLFWwindow *GetWindow() const;
 
   /**
    * Get multiple sample number.
    * @return multiple sample number
    */
-  int GetMultiSampleNum() const;
+  [[nodiscard]] int GetMultiSampleNum() const;
+
+  glm::mat4 &GetViewportMatrix();
 
  private:
   /**
@@ -181,6 +184,8 @@ class Render {
   GLFWwindow *window_{};
   // msaa sample num
   int multi_sample_num_{4};
+  // viewport matrix(column vector)
+  glm::mat4 viewport_matrix_;
 };
 
 

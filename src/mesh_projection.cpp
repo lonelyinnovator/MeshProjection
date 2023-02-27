@@ -11,10 +11,7 @@ MeshProjection::MeshProjection(float radius) {
   SetUpProjCamera();
 }
 
-
-MeshProjection::~MeshProjection() {
-
-}
+MeshProjection::~MeshProjection() = default;
 
 void MeshProjection::ProjSnapshot(const std::string &output_dir, const std::string &prefix, int width, int height,
                                   bool is_rgb) {

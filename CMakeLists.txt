@@ -28,4 +28,3 @@ LINK_DIRECTORIES(${lib_dir})
 
 # add root src subdirectory
 ADD_SUBDIRECTORY(${root_src_dir})
-

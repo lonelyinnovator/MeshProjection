@@ -7,9 +7,18 @@ Model::Model(const std::string &model_path, const std::string &segPath, bool gam
   LoadModel(model_path);
 }
 
+Model::~Model() {
+
+}
+
 void Model::Draw(Shader &shader) {
   for (unsigned int i = 0; i < meshes_.size(); i++)
     meshes_[i].Draw(shader);
+}
+
+void Model::DeleteAllMeshesObject() {
+  for (auto &m: meshes_)
+    m.DeleteObject();
 }
 
 const std::vector<Texture> &Model::GetTexturesLoaded() const {
@@ -192,19 +201,27 @@ void Model::LoadModelSeg(const std::string &seg_path) {
   // no seg path
   if (seg_path.empty()) return;
   model_seg_.clear();
-  std::ifstream ifs;
-  // open seg file
-  ifs.open(seg_path, std::ios::in);
-  if (!ifs.is_open()) {
-    std::cout << seg_path << " read error!" << std::endl;
-    return;
+
+  FileProcess file_process(seg_path, std::ios::in);
+  std::string line;
+  int seg_class = 0;
+  try {
+    while (!file_process.IsEOF()) {
+      line = file_process.ReadLine();
+      if (line.empty()) continue;
+      seg_class = std::stoi(line);
+      max_seg_class_ = std::max(max_seg_class_, seg_class);
+      model_seg_.push_back(seg_class);
+    }
   }
-  std::string buf;
-  while (std::getline(ifs, buf)) {
-    int seg_class = std::stoi(buf);
-    max_seg_class_ = std::max(max_seg_class_, seg_class);
-    model_seg_.push_back(seg_class);
+  catch (std::invalid_argument &e) {
+    std::cout << seg_path + " read stoi invalid argument! " + e.what() << std::endl;
   }
+  catch (std::exception &e) {
+    std::cout << seg_path + " read unknown error! " + e.what() << std::endl;
+  }
+  file_process.CloseFile();
+
 }
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma) {

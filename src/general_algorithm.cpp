@@ -18,3 +18,13 @@ int GeneralAlgorithm::MostFreqNum(std::vector<int> &nums) {
   }
   return res;
 }
+
+std::vector<std::string> GeneralAlgorithm::Split(const std::string &in_str, char delim) {
+  std::vector<std::string> res;
+  std::stringstream ss(in_str);
+  std::string line;
+  while (std::getline(ss, line, delim)) {
+    res.push_back(line);
+  }
+  return res;
+}

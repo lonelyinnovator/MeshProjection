@@ -1,3 +1,7 @@
+/**
+ * Shader to render object.
+ */
+
 #ifndef MESHPROJECTION_SHADER_H
 #define MESHPROJECTION_SHADER_H
 
@@ -11,9 +15,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "file_process.h"
+#include "user_exception.hpp"
+
+/**
+ * Shader to render object in OpenGL.
+ * Examples:
+ *   Shader shader(v_path, f_path);
+ *   shader.use();
+ *   shader.setMat4("mvp", mvp);
+ */
 class Shader {
  public:
-
   /**
    * Init shader.
    * @param vertex_shader_source_file_path file path of vertex shader
@@ -86,7 +99,7 @@ class Shader {
    * Get shader program id.
    * @return shader program id
    */
-  unsigned int GetProgramId() const;
+  [[nodiscard]] unsigned int GetProgramId() const;
 
  private:
   /**

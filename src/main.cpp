@@ -6,6 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "render.h"
+#include "user_exception.hpp"
 
 int main(int argc, char *argv[]) {
 
@@ -13,16 +14,23 @@ int main(int argc, char *argv[]) {
 //        std::filesystem::remove_all(image_dir);
 //    }
 
-  Render render;
+  try {
+    Render render;
+    render.OneCameraRender();
 
-  render.OneCameraRender();
-
-  // render shaded
+//    render shaded
 //    render.MeshProjectionRender(true);
-  // render depth map
-//    render.mesh_projection_render(false);
+//    render depth map
+//    render.MeshProjectionRender(false);
 
-//    shaded_seg_render(window);
+//    render.ShadedSegRender();
+  }
+  catch (const UserException &e) {
+    std::cout << "render error!" << e.what() << std::endl;
+  }
+  catch (const std::exception &e) {
+    std::cout << "render unknown error! " << e.what() << std::endl;
+  }
 
   glfwTerminate();
   return 0;

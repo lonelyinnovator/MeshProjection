@@ -7,6 +7,7 @@
 #define MESHPROJECTION_GENERAL_ALGORITHM_H
 
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -24,6 +25,14 @@ class GeneralAlgorithm {
    * @return most frequently appeared number
    */
   static int MostFreqNum(std::vector<int> &nums);
+
+  /**
+   * Split string by delimiter into sub string parts
+   * @param in_str input string
+   * @param delim delimiter
+   * @return split sub string
+   */
+  static std::vector<std::string> Split(const std::string &in_str, char delim = '\n');
 };
 
 

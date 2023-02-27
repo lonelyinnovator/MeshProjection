@@ -20,9 +20,7 @@ Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, st
   SetupMesh();
 }
 
-Mesh::~Mesh() {
-
-}
+Mesh::~Mesh() = default;
 
 void Mesh::Draw(Shader &shader) {
   // bind appropriate textures
@@ -57,6 +55,12 @@ void Mesh::Draw(Shader &shader) {
 
   // always good practice to set everything back to defaults once configured.
   glActiveTexture(GL_TEXTURE0);
+}
+
+void Mesh::DeleteObject(){
+  glDeleteBuffers(1, &vbo_);
+  glDeleteBuffers(1, &ebo_);
+  glDeleteVertexArrays(1, &vao_);
 }
 
 const std::vector<Vertex> &Mesh::GetVertices() const {
@@ -195,4 +199,5 @@ void Mesh::SetupMesh() {
 
   glBindVertexArray(0);
 }
+
 

@@ -11,7 +11,6 @@ struct Material
 struct DirLight
 {
     vec3 direction;
-
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -34,7 +33,6 @@ vec3 CalcDirLight(DirLight light);
 
 void main()
 {
-
     vec3 result = CalcDirLight(dirLight);
 
     FragColor = vec4(result, 1.0);
@@ -55,7 +53,6 @@ vec3 CalcDirLight(DirLight light)
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);
 
-//     return (ambient + diffuse + specular);
+    //     return (ambient + diffuse + specular);
     return (ambient + diffuse);
 }
-

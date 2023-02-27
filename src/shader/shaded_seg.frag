@@ -11,7 +11,6 @@ struct Material
 struct DirLight
 {
     vec3 direction;
-
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -44,10 +43,10 @@ uniform int maxSegClass;
 const int numColors = 100;
 uniform vec3 allColors[numColors];
 
+
 vec3 CalcDirLight(DirLight light);
 
 float ColorInterpolation(float target, float cMin, float cMax);
-
 
 void main()
 {
@@ -55,7 +54,7 @@ void main()
 
     if (maxSegClass != 0)
     {
-//         result *= ColorInterpolation(float(Seg) / float(maxSegClass), 0.4, 1);
+        //        result *= ColorInterpolation(float(Seg) / float(maxSegClass), 0.4, 1);
         result *= allColors[Seg];
     }
 
@@ -77,9 +76,10 @@ vec3 CalcDirLight(DirLight light)
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);
 
-//     return (ambient + diffuse + specular);
+    //     return (ambient + diffuse + specular);
     return (ambient + diffuse);
 }
+
 
 float ColorInterpolation(float target, float cMin, float cMax)
 {

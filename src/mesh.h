@@ -105,52 +105,57 @@ class Mesh {
   void Draw(Shader &shader);
 
   /**
+   * Delete all object(vao, vbo, ebo).
+   */
+  void DeleteObject();
+
+  /**
    * Get mesh vertices.
    * @return mesh vertices
    */
-  const std::vector<Vertex> &GetVertices() const;
+  [[nodiscard]] const std::vector<Vertex> &GetVertices() const;
 
   /**
    * Get mesh indices.
    * @return mesh indices
    */
-  const std::vector<unsigned int> &GetIndices() const;
+  [[nodiscard]] const std::vector<unsigned int> &GetIndices() const;
 
   /**
    * Get mesh triangles
    * @return mesh triangles
    */
-  const std::vector<Triangle> &GetTriangles() const;
+  [[nodiscard]] const std::vector<Triangle> &GetTriangles() const;
 
   /**
    * Get mesh textures.
    * @return mesh textures
    */
-  const std::vector<Texture> &GetTextures() const;
+  [[nodiscard]] const std::vector<Texture> &GetTextures() const;
 
   /**
    * Get VAO.
    * @return VAO
    */
-  unsigned int GetVao() const;
+  [[nodiscard]] unsigned int GetVao() const;
 
   /**
    * Get VBO.
    * @return VBO
    */
-  unsigned int GetVbo() const;
+  [[nodiscard]] unsigned int GetVbo() const;
 
   /**
    * Get EBO.
    * @return EBO
    */
-  unsigned int GetEbo() const;
+  [[nodiscard]] unsigned int GetEbo() const;
 
   /**
    * Get triangles_per_vertex
    * @return triangles_per_vertex
    */
-  const std::vector<std::vector<unsigned int>> &GetTriPerVer() const;
+  [[nodiscard]] const std::vector<std::vector<unsigned int>> &GetTriPerVer() const;
 
  private:
   /**

@@ -39,7 +39,7 @@ class MeshProjection {
    * Use radius to init mesh projection.
    * @param radius distance between center point to viewer(camera)
    */
-  MeshProjection(float radius);
+  explicit MeshProjection(float radius);
 
   /**
    * Deconstruct
@@ -60,7 +60,7 @@ class MeshProjection {
    * Get radius.
    * @return radius
    */
-  float GetRadius() const;
+  [[nodiscard]] float GetRadius() const;
 
   /**
    * Set radius.
@@ -72,7 +72,7 @@ class MeshProjection {
    * Get current camera index.
    * @return current camera index
    */
-  int GetCurrentCameraIndex() const;
+  [[nodiscard]] int GetCurrentCameraIndex() const;
 
   /**
    * Reset current camera index to -1(default value)
