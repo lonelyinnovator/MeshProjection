@@ -31,9 +31,8 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
   int min_h, max_h, min_w, max_w;
   float tmp;
   for (auto &mesh: one_model.GetMeshes()) {
-    std::vector<std::vector<std::pair<int, float>>> tri_per_pixel(screen_height_,
-                                                                  std::vector<std::pair<int, float>>(screen_width_,
-                                                                                                     {-1, 1.0f}));
+    std::vector<std::vector<int>> tri_per_pixel(screen_height_, std::vector<int>(screen_width_, -1));
+    std::vector<std::vector<float>> depth(screen_height_, std::vector<float>(screen_width_, 1.0f));
     mesh_vertices = mesh.GetVertices();
     // total transformations
     for (auto &vertex: mesh_vertices) {
@@ -64,9 +63,9 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
           if (GeneralAlgorithm::IsInsideTriangle(point, tv)) {
             auto [alpha, beta, gamma] = GeneralAlgorithm::ComputeBaryCentric2d(point, tv);
             float z = alpha * v1.z + beta * v2.z + gamma * v3.z;
-            if (tri_per_pixel[i][j].second > z) {
-              tri_per_pixel[i][j].first = k;
-              tri_per_pixel[i][j].second = z;
+            if (depth[i][j] > z) {
+              tri_per_pixel[i][j] = k;
+              depth[i][j] = z;
             }
           }
         }
@@ -80,8 +79,8 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
     FileProcess file_process(std::format("{}pixel_{}.csv", file_dir, mp.GetCameraViewFilename()), std::ios::out);
     for (int i = 0; i < screen_height_; ++i) {
       for (int j = 0; j < screen_width_; ++j) {
-        if (j != 0) file_process.Write(",");
-        file_process.Write(std::to_string(tri_per_pixel[i][j].first));
+        if (j) file_process.Write(",");
+        file_process.Write(std::to_string(tri_per_pixel[i][j]));
       }
       file_process.Write("\n");
     }
@@ -218,14 +217,14 @@ void Render::MeshProjectionRender(bool shaded) {
   }
 
   // load model by model name
-  std::string model_name[] = {"1"};
   std::vector<Model> all_models;
-  for (auto &name: model_name) {
-    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
-  }
-//  for (auto &name: PsbDataset::GetAllModelName()) {
+//  std::string model_name[] = {"1"};
+//  for (auto &name: model_name) {
 //    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
 //  }
+  for (auto &name: PsbDataset::GetAllModelName()) {
+    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
+  }
 
   MeshProjection mesh_projection;
 
