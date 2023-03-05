@@ -11,6 +11,10 @@
 #include <string>
 #include <sstream>
 
+#define FMT_HEADER_ONLY
+
+#include <fmt/core.h>
+
 #include "user_exception.hpp"
 
 

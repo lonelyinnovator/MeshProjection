@@ -10,7 +10,7 @@ Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, st
 
   FillTriangles(triangle_seg);
 
-  ComputeVertexNormals();
+//  ComputeVertexNormals();
 
   if (triangle_seg.size() * 3 == indices.size()) {
     ComputeVertexSeg();

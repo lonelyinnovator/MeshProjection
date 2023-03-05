@@ -8,8 +8,11 @@
 
 #include <iostream>
 #include <string>
-#include <format>
 #include <utility>
+
+#define FMT_HEADER_ONLY
+
+#include <fmt/format.h>
 
 /**
  * User exception, base class.
@@ -79,7 +82,7 @@ class FStreamException : public UserException {
    * @return formatted error message
    */
   [[nodiscard]] std::string what() const override {
-    return std::format("error message: {}, id: {}", error_message_, id_);
+    return fmt::format("error message: {}, id: {}", error_message_, id_);
   }
 };
 

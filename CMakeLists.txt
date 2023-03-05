@@ -2,7 +2,7 @@
 
 PROJECT ("MeshProjection")
 
-SET(CMAKE_CXX_STANDARD 20)
+SET(CMAKE_CXX_STANDARD 17)
 
 SET(3rd_PARTY_DIR "E:/Work/vs2019Work/Third_Party")
 SET(OpenCV_DIR "${3rd_PARTY_DIR}/opencv/install")

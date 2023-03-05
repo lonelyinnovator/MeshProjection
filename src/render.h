@@ -22,6 +22,7 @@
 #include "psbdataset.h"
 #include "color.hpp"
 #include "file_process.h"
+#include "shapenetcore_dataset.h"
 
 // opengl screen width
 const int kScreenWidth = 800;
@@ -72,7 +73,7 @@ class Render {
    * Render mesh projection.
    * @param shaded set true to use shaded render; false to Use depth map render
    */
-  void MeshProjectionRender(bool shaded);
+  void MeshProjectionRender(std::vector<Model> &all_models, bool shaded);
 
   /**
    * Render shaded segmentation result.
@@ -188,6 +189,8 @@ class Render {
   int multi_sample_num_{4};
   // viewport matrix(column vector)
   glm::mat4 viewport_matrix_;
+
+
 };
 
 

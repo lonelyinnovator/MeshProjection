@@ -14,6 +14,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define FMT_HEADER_ONLY
+
+#include <fmt/core.h>
+
 #include "camera.h"
 
 // roll number: camera rotation number

@@ -14,7 +14,7 @@ MeshProjection::MeshProjection(float radius) {
 MeshProjection::~MeshProjection() = default;
 
 std::string MeshProjection::GetCameraViewFilename() const {
-  return std::format("{}_{}", std::to_string(current_camera_index_ / kRollNum),
+  return fmt::format("{}_{}", std::to_string(current_camera_index_ / kRollNum),
                      std::to_string(current_camera_index_ % kRollNum));
 }
 
@@ -22,8 +22,8 @@ std::string MeshProjection::GetCameraViewFilename() const {
 void MeshProjection::ProjSnapshot(const std::string &output_dir, const std::string &prefix, int width, int height,
                                   bool is_rgb) const {
   if (current_camera_index_ >= 0) {
-    std::string filename = std::format("{}_{}.png", prefix, GetCameraViewFilename());
-    Camera::Snapshot(filename, std::format(R"({}\{}\)", output_dir, prefix), width, height, is_rgb);
+    std::string filename = fmt::format("{}_{}.png", prefix, GetCameraViewFilename());
+    Camera::Snapshot(filename, fmt::format(R"({}\{}\)", output_dir, prefix), width, height, is_rgb);
   }
 }
 
@@ -57,6 +57,7 @@ bool MeshProjection::GetProjCameraByIndex(Camera &out_camera, int index) {
   if (index < 0 || index >= kProjCameraNum) {
     return false;
   }
+  current_camera_index_ = index;
   out_camera = proj_cameras_[index];
   return true;
 }

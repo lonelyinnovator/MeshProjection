@@ -4,8 +4,11 @@
 #define MESHPROJECTION_COLOR_HPP
 
 #include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <fmt/core.h>
+
 
 class Color {
  public:
@@ -61,14 +64,14 @@ class Color {
   // all colors
   constexpr static const glm::vec3 AllColors[]{
       Red, Blue, Green, Yellow, Cyan,
-      Orange,Purple, Pink, Grey, Gold,
-      Brown,HotPink, DeepPink, VioletRed, Maroon,
-      Magenta,Violet, Snow, GhostWhite, WhiteSmoke,
-      PeachPuff,LemonChiffon, Lavender, LightSlateGray, LightGray,
-      CornflowerBlue,DeepSkyBlue, LightSkyBlue, Aquamarine, DarkGreen,
-      MediumSeaGreen,SpringGreen, GreenYellow, YellowGreen, LightYellow,
-      DarkGoldenrod,RosyBrown, IndianRed, Salmon, Coral,
-      Tomato,OrangeRed, DarkOrchid, White, Black,
+      Orange, Purple, Pink, Grey, Gold,
+      Brown, HotPink, DeepPink, VioletRed, Maroon,
+      Magenta, Violet, Snow, GhostWhite, WhiteSmoke,
+      PeachPuff, LemonChiffon, Lavender, LightSlateGray, LightGray,
+      CornflowerBlue, DeepSkyBlue, LightSkyBlue, Aquamarine, DarkGreen,
+      MediumSeaGreen, SpringGreen, GreenYellow, YellowGreen, LightYellow,
+      DarkGoldenrod, RosyBrown, IndianRed, Salmon, Coral,
+      Tomato, OrangeRed, DarkOrchid, White, Black,
   };
 
   /**
@@ -84,7 +87,7 @@ class Color {
    * @param color color
    */
   static void PrintColor(const glm::vec3 &color) {
-    std::cout << std::format("{} {} {}", color.x, color.y, color.z) << std::endl;
+    std::cout << fmt::format("{} {} {}", color.x, color.y, color.z) << std::endl;
   }
 };
 

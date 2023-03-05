@@ -39,11 +39,8 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
       glm::vec4 p = total_matrix * glm::vec4(vertex.position, 1.0f);
       vertex.position = glm::vec3(p / p.w);
       tmp = vertex.position.x;
-//      vertex.position.x = static_cast<float>(screen_height_) - round(vertex.position.y);
       vertex.position.x = static_cast<float>(screen_height_) - vertex.position.y - 1;
-//      vertex.position.y = round(tmp);
       vertex.position.y = tmp;
-//      std::cout << vertex.position.z << std::endl;
     }
     auto mesh_triangles = mesh.GetTriangles();
     // rasterization
@@ -55,10 +52,10 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
       max_h = static_cast<int>(round(std::max({v1.x, v2.x, v3.x})));
       min_w = static_cast<int>(round(std::min({v1.y, v2.y, v3.y})));
       max_w = static_cast<int>(round(std::max({v1.y, v2.y, v3.y})));
-//        std::cout << std::format("{} {} {} {}", min_h, max_h, min_w, max_w) << "; ";
+//        std::cout << fmt::format("{} {} {} {}", min_h, max_h, min_w, max_w) << "; ";
       std::vector<glm::vec2> tv{glm::vec2(v1), glm::vec2(v2), glm::vec2(v3)};
-      for (int i = min_h; i <= max_h; ++i) {
-        for (int j = min_w; j <= max_w; ++j) {
+      for (int i = std::max(min_h, 0); i <= std::min(max_h, screen_height_ - 1); ++i) {
+        for (int j = std::max(min_w, 0); j <= std::min(max_w, screen_width_ - 1); ++j) {
           glm::vec2 point = glm::vec2(i, j);
           if (GeneralAlgorithm::IsInsideTriangle(point, tv)) {
             auto [alpha, beta, gamma] = GeneralAlgorithm::ComputeBaryCentric2d(point, tv);
@@ -72,21 +69,23 @@ void Render::RasterizationFromScratch(const Model &one_model, const glm::mat4 &t
       }
     }
     // write tri_per_pixel to csv file
-    std::string file_dir = PsbDataset::GetPixelDir() + one_model.GetName() + R"(\)";
+//    std::string file_dir = PsbDataset::GetPixelDir() + one_model.GetName() + R"(\)";
+    int model_class = 0;
+    std::string file_dir = fmt::format(R"({}{}\{}\pixel\)", ShapeNetCoreDataset::GetGenDir(),
+                                       ShapeNetCoreDataset::GetModelClasses()[model_class],
+                                       one_model.GetName());
     if (!std::filesystem::exists(file_dir)) {
       std::filesystem::create_directories(file_dir);
     }
-    FileProcess file_process(std::format("{}pixel_{}.csv", file_dir, mp.GetCameraViewFilename()), std::ios::out);
+    FileProcess file_process(fmt::format("{}pixel_{}.csv", file_dir, mp.GetCameraViewFilename()), std::ios::out);
     for (int i = 0; i < screen_height_; ++i) {
       for (int j = 0; j < screen_width_; ++j) {
-        if (j) file_process.Write(",");
-        file_process.Write(std::to_string(tri_per_pixel[i][j]));
+        if (tri_per_pixel[i][j] == -1) continue;
+        file_process.Write(fmt::format("{},{},{}\n", i, j, tri_per_pixel[i][j]));
       }
-      file_process.Write("\n");
     }
     file_process.CloseFile();
   }
-
 }
 
 void Render::OneCameraRender() {
@@ -105,7 +104,7 @@ void Render::OneCameraRender() {
   std::vector<Model> all_models;
   int seg_num = 0;
   for (auto &name: model_name) {
-    std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
+    std::string seg_path = fmt::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
     all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off", seg_path));
   }
 //    for (auto &name: PsbDataset::GetAllModelName()) {
@@ -180,14 +179,14 @@ void Render::OneCameraRender() {
           h_min = std::min(h_min, x);
           w_max = std::max(w_max, y);
           h_max = std::max(h_max, y);
-//          std::cout << std::format("{} {} {}", x, y, p.z) << std::endl;
-//          ofs << std::format("{},{}", static_cast<float>(screen_height_) - y, x) << std::endl;
-          file_process.Write(std::format("{},{}\n", static_cast<float>(screen_height_) - y, x));
+//          std::cout << fmt::format("{} {} {}", x, y, p.z) << std::endl;
+//          ofs << fmt::format("{},{}", static_cast<float>(screen_height_) - y, x) << std::endl;
+          file_process.Write(fmt::format("{},{}\n", static_cast<float>(screen_height_) - y, x));
         }
       }
       file_process.CloseFile();
 
-//      std::cout << std::format("w_min: {}, w_max: {}, h_min: {}, h_max:{}", w_min, w_max, h_min, h_max) << std::endl;
+//      std::cout << fmt::format("w_min: {}, w_max: {}, h_min: {}, h_max:{}", w_min, w_max, h_min, h_max) << std::endl;
 
       glfwSwapBuffers(window_);
       glfwPollEvents();
@@ -202,31 +201,16 @@ void Render::OneCameraRender() {
   glDeleteProgram(model_shader.GetProgramId());
 }
 
-void Render::MeshProjectionRender(bool shaded) {
-
-//    glfwSetCursorPosCallback(window, mouse_move_callback);
-//    glfwSetScrollCallback(window, mouse_scroll_callback);
-
-  // set glfw to capture mouse
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+void Render::MeshProjectionRender(std::vector<Model> &all_models, bool shaded) {
   // shader
   Shader model_shader = Shader(R"(shader\shaded.vert)", R"(shader\shaded.frag)");
   if (!shaded) {
     model_shader = Shader(R"(shader\depth_map.vert)", R"(shader\depth_map.frag)");
   }
 
-  // load model by model name
-  std::vector<Model> all_models;
-//  std::string model_name[] = {"1"};
-//  for (auto &name: model_name) {
-//    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
-//  }
-  for (auto &name: PsbDataset::GetAllModelName()) {
-    all_models.emplace_back(Model(PsbDataset::GetModelDir() + name + ".off"));
-  }
+  int model_class = 0;
 
-  MeshProjection mesh_projection;
+  MeshProjection mesh_projection(1.0f);
 
   // mvp matrix
   glm::mat4 projection(1.0f), view(1.0f), model(1.0f), model_view_projection(1.0f);
@@ -236,18 +220,22 @@ void Render::MeshProjectionRender(bool shaded) {
     // repeat render every camera repeat_num times
 //    int cnt = 1, repeat_num = 2;
     while (!glfwWindowShouldClose(window_)) {
-//      // get mesh projection camera
+      // get mesh projection camera
 //      if (cnt % (repeat_num + 1) == 0) {
 //        cnt = 1;
 //        auto success = mesh_projection.GetNextProjCamera(camera_);
+//        if (mesh_projection.GetCurrentCameraIndex() == -1) {
+//          mesh_projection.ResetCurrentCameraIndex();
+//          continue;
+//        }
 //        if (!success) {
 //          mesh_projection.ResetCurrentCameraIndex();
-////                glfwSetWindowShouldClose(window, true);
 //          break;
 //        }
 //      } else {
 //        cnt++;
 //      }
+
       auto success = mesh_projection.GetNextProjCamera(camera_);
       // render finished
       if (!success) {
@@ -265,7 +253,6 @@ void Render::MeshProjectionRender(bool shaded) {
       delta_time_ = current_frame - last_frame_;
       last_frame_ = current_frame;
 
-//      process_input(window_);
 
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -312,22 +299,27 @@ void Render::MeshProjectionRender(bool shaded) {
       glfwPollEvents();
 
       // compute and save triangle id on every pixel
-      RasterizationFromScratch(all_models[i], viewport_matrix_ * model_view_projection, mesh_projection);
-
+//      RasterizationFromScratch(all_models[i], viewport_matrix_ * model_view_projection, mesh_projection);
       // snapshot
 //      if (shaded) {
-//        mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "shaded",
-//                                     screen_width_, screen_height_, false);
+//        mesh_projection.ProjSnapshot(
+//            fmt::format(R"({}{}\{})", ShapeNetCoreDataset::GetGenDir(),
+//                        ShapeNetCoreDataset::GetModelClasses()[model_class],
+//                        all_models[i].GetName()), "shaded",
+//            screen_width_, screen_height_, false);
 //      } else {
-//        mesh_projection.ProjSnapshot(PsbDataset::GetImageDir() + all_models[i].GetName(), "depth",
-//                                     screen_width_, screen_height_, false);
+//        mesh_projection.ProjSnapshot(
+//            fmt::format(R"({}{}\{})", ShapeNetCoreDataset::GetGenDir(),
+//                        ShapeNetCoreDataset::GetModelClasses()[model_class],
+//                        all_models[i].GetName()), "depth",
+//            screen_width_, screen_height_, false);
 //      }
     }
   }
-  for (auto &m: all_models) {
-    m.DeleteAllMeshesObject();
-  }
-  glDeleteProgram(model_shader.GetProgramId());
+//  for (auto &m: all_models) {
+//    m.DeleteAllMeshesObject();
+//  }
+//  glDeleteProgram(model_shader.GetProgramId());
 }
 
 void Render::ShadedSegRender() {
@@ -341,12 +333,12 @@ void Render::ShadedSegRender() {
   std::vector<Model> all_models;
   for (auto &name: model_name) {
     std::string model_path = PsbDataset::GetModelDir() + name + ".off";
-    std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
+    std::string seg_path = fmt::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
     all_models.emplace_back(Model(model_path, seg_path));
   }
 //  for (auto &name: PsbDataset::GetAllModelName()) {
 //    std::string model_path = PsbDataset::GetModelDir() + name + ".off";
-//    std::string seg_path = std::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
+//    std::string seg_path = fmt::format(R"({0}{1}\{1}_{2}.seg)", PsbDataset::GetSegDir(), name, seg_num);
 //    all_models.emplace_back(Model(model_path, seg_path));
 //  }
 
@@ -384,7 +376,7 @@ void Render::ShadedSegRender() {
       // set all colors
       for (int j = 0; j < Color::GetAllColorsSize(); ++j) {
         glm::vec3 tmp(Color::AllColors[j]);
-        model_shader.SetVec3(std::format("allColors[{}]", j), tmp);
+        model_shader.SetVec3(fmt::format("allColors[{}]", j), tmp);
       }
 
       // set material

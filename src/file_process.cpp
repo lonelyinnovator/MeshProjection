@@ -15,7 +15,7 @@ void FileProcess::OpenFile(const std::string &file_path, int mode) {
 //  fstream_.exceptions(std::fstream::badbit);
   fstream_.open(file_path, mode);
   if (!fstream_.is_open()) {
-    throw FStreamException(std::format("fstream open {} error!", file_path));
+    throw FStreamException(fmt::format("fstream open {} error!", file_path));
   }
 }
 
